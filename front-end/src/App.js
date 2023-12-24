@@ -2,58 +2,27 @@ import './App.css';
 import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { Client } from '@stomp/stompjs';
 
 function App() {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const jsonlink = 'http://localhost/data.json';
-    const wslink = 'ws://localhost:8080/ws';
 
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          // // Client-side code (e.g., in a browser)
-          // const socket = io.connect(wslink);
+    const client = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      onConnect: () => {
+        client.publish({ destination: '/temperature', body: 'First Message' });
+        client.subscribe('/topic/temperature', message =>
+          console.log(`Received: ${message.body}`)
+        );
+      },
+    });
+  
+    client.activate();
 
-          // // send getData message to the temperature topic
-          // socket.emit('getData', '/topic/temperature');
-
-          // // Receive data
-          // socket.on('receiveMessage', (result) => {
-          //   setData(result.message));
-          //   console.log('Received message:', result.message);
-          // });
-
-          const response = await fetch(jsonlink);
-
-          const result = await response.json();
-          setData(result);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      // console.log('hehe')
-      fetchData(); 
-
-      const intervalId = setInterval(fetchData, 1000);
-
-      return () => clearInterval(intervalId);
-    }, []);
-
-    if(!loading) {
-      console.log(data);
-      // console.log(data[0]);
-      // console.log(data.data);
-      // console.log();
-
-    } else {
-      console.log("Fetching data...")
-    }
-
-    
+      
     const dataFE = {
       // labels: ['January', 'February', 'March', 'April', 'May'],
       labels: data.data ? data.data.map(a => {

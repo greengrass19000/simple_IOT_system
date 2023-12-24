@@ -14,7 +14,7 @@ public class TaskController {
 
     @Scheduled(fixedRate = 1000) // Push message every 1 seconds
     public void sendPeriodicMessage() {
-        long value = Math.round(Math.random() * 100);
+        long value = Math.round(Math.random() * 3);
         String message = String.format("Task: %d", value);
         messagingTemplate.convertAndSend("/topic/tasks", message);
     }
