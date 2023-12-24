@@ -15,4 +15,9 @@ public class TemperatureService {
     public Iterable<Temperature> getData() {
         return repo.findAll();
     }
+
+    public void createRecord(Double value) {
+        Temperature m = new Temperature(value);
+        repo.save(m);
+    }
 }

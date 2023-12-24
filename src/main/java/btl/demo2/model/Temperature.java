@@ -21,6 +21,13 @@ public class Temperature {
     @CreationTimestamp
     private Instant createdAt;
 
+    public Temperature() {
+    }
+
+    public Temperature(Double value) {
+        this.value = value;
+    }
+
     public Integer getId() {
         return this.id;
     }
