@@ -1,0 +1,19 @@
+version: "3.7"
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  mysql:
+    container_name: iot
+    image: "mysql:latest"
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=iot
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3306:3306"
+    networks:
+      - app-tier

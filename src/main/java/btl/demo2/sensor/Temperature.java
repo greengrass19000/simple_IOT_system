@@ -1,3 +1,5 @@
+package btl.demo2.sensor;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -11,7 +13,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Client implements Runnable {
+public class Temperature implements Runnable {
 
     private static Socket clientSocket = null;
     private static ObjectInputStream is = null;
@@ -39,17 +41,16 @@ public class Client implements Runnable {
             System.err.println("ERROR: The server is full.");
         }
 
-        if (clientSocket != null && os != null && is != null) 
+        if (clientSocket != null && os != null && is != null)
             try {
-                new Thread(new Client()).start();
+                new Thread(new Temperature()).start();
                 while (!logout) {
                     String msg = (String) input.readLine().trim();
 
                     if ((msg.split(":").length > 1)) {
                         os.writeObject(msg);
                         os.flush();
-                    }
-                    else {
+                    } else {
                         os.writeObject(msg);
                         os.flush();
                     }
@@ -62,18 +63,20 @@ public class Client implements Runnable {
                 System.err.println("ERROR: IOException - " + e);
             }
     }
+
     public void run() {
         String response;
 
         try {
             while ((response = (String) is.readObject()) != null) {
-                
+
                 System.out.println(response);
 
-                if (response.indexOf("See you again") != -1) break;
+                if (response.indexOf("See you again") != -1)
+                    break;
             }
             if (response.indexOf("See you again") == -1)
-               System.out.println("See you again!");
+                System.out.println("See you again!");
             logout = true;
             System.exit(0);
 
