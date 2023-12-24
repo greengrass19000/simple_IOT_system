@@ -1,0 +1,19 @@
+1. Mô tả bài toán 
+
+Xây dựng chương trình truyền thông cho hệ thống IoT bao gồm các thành phần  
+
+IoT nodes và IoT Gateway (đóng vai trò server) 
+
+01 Chương trình tại IoT nodes 
+
+01 Chương trình phía server (gateway)  
+
+Yêu cầu chính:  
+
+Chương trình phía gateway có khả năng hiển thị thông tin các cảm biến thực hiện kết nối với gateway. 
+
+Chương trình tại IoT nodes có khả năng sinh dữ liệu cho các cảm biến: tự động sinh dữ liệu cảm biến và gửi dữ liệu lên gateway. Đồng thời, chương trình có khả năng hiển thị dữ liệu được gửi từ gateway (ví dụ, thông tin điều khiển IoT node). 
+
+Chương trình phía gateway có khả năng hiển thị dữ liệu nhận được từ các IoT nodes (sử dụng các biểu đồ line chart, bar chart, pie chart để hiển thị). Đồng thời, chương trình có khả năng sinh dữ liệu điều khiển IoT node một cách tự động và gửi đến các IoT nodes. 
+
+Chương trình phía gateway hiển thị đánh giá số lượng tối đa các node cảm biến có thể kết nối đến gateway. Cần trình bày rõ mô hình máy chủ sử dụng trong hệ thống. 
