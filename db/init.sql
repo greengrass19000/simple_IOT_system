@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS temperatures (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    `value` REAL NOT NULL,
-    created_at INTEGER NOT NULL
-);
