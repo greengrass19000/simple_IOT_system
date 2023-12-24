@@ -2,7 +2,10 @@ package btl.demo2.sensor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -15,6 +18,8 @@ import btl.demo2.controller.TemperatureController;
 import jakarta.websocket.ClientEndpoint;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +38,10 @@ public class Sensor implements StompSessionHandler {
             WebSocketClient client = new StandardWebSocketClient();
 
             WebSocketStompClient stompClient = new WebSocketStompClient(client);
-            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+            List<MessageConverter> converters = new ArrayList<MessageConverter>();
+            converters.add(new MappingJackson2MessageConverter()); // used to handle json messages
+            converters.add(new StringMessageConverter());
+            stompClient.setMessageConverter(new CompositeMessageConverter(converters));
 
             StompSessionHandler sessionHandler = this;
             stompClient.connectAsync(endpoint, sessionHandler);
@@ -44,15 +52,15 @@ public class Sensor implements StompSessionHandler {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        String msg = (String) payload;
-        logger.info("Task received : " + msg);
+        String message = (String) payload;
+        logger.info("Received message: " + message);
     }
 
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+        session.subscribe("/topic/tasks", this);
         this.session = session;
         this.startPubTemperatures();
-        // this.startReceiveTasks();
     }
 
     @Override
@@ -72,13 +80,18 @@ public class Sensor implements StompSessionHandler {
     }
 
     private void startPubTemperatures() {
-        Runnable task = () -> {
-            logger.info("Publish temperature to broker ...");
-            Double temperatureData = generateTemperatureData();
-            session.send("/app/temperature", temperatureData);
-        };
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(task, 0, 3, TimeUnit.SECONDS);
+        try {
+            Runnable task = () -> {
+                logger.info("Publish temperature to broker ...");
+                Double temperatureData = generateTemperatureData();
+                session.send("/app/temperature", temperatureData);
+            };
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleWithFixedDelay(task, 0, 3, TimeUnit.SECONDS);
+            scheduler.wait();
+        } catch (Exception e) {
+            System.out.print(e);
+        }
     }
 
     private Double generateTemperatureData() {
@@ -86,13 +99,15 @@ public class Sensor implements StompSessionHandler {
         return temperature;
     }
 
-    private void startReceiveTasks() {
-        session.subscribe("/topic/tasks", this);
+    private void waitAll() {
+        while (true) {
+        }
     }
 
     public static void main(String[] args) {
         String endpoint = "ws://localhost:8080/ws";
         Sensor sensor = new Sensor();
         sensor.connect(endpoint);
+        sensor.waitAll();
     }
 }
